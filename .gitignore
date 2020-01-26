@@ -1,0 +1,6 @@
+Makefile
+MYMETA.yml
+MYMETA.json
+MANIFEST*
+blib/*
+pm_to_blib
