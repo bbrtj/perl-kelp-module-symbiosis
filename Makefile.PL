@@ -8,9 +8,15 @@ WriteMakefile(
 	VERSION_FROM => 'lib/Kelp/Module/Symbiosis.pm',
 	MIN_PERL_VERSION => '5.010',
 
+	TEST_REQUIRES => {
+		"Test::More" => 0,
+		"HTTP::Request::Common" => 0,
+	},
+
 	PREREQ_PM => {
 		'Kelp' => '>= 1',
 		'Plack' => '>= 1',
+		'Carp' => 0,
 	},
 
 	META_MERGE => {

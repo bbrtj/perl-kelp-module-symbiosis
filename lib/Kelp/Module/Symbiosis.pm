@@ -22,7 +22,7 @@ sub mount
 
 sub run_all
 {
-	my ($self) = @_;
+	my ($self) = shift;
 	my $psgi_apps = Plack::App::URLMap->new;
 
 	my $error = "Cannot start the ecosystem:";
@@ -31,10 +31,16 @@ sub run_all
 			unless blessed $app;
 		croak "$error application mounted under $path cannot run()"
 			unless $app->can("run");
-		$psgi_apps->map($path, $app->run);
+		$psgi_apps->map($path, $app->run(@_));
 	}
 
 	return $psgi_apps->to_app;
+}
+
+sub run
+{
+	my ($self) = shift;
+	return $self->run_all(@_);
 }
 
 sub build

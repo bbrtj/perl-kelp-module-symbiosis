@@ -1,4 +1,5 @@
-Makefile
+Makefile*
+!Makefile.PL!
 MYMETA.yml
 MYMETA.json
 MANIFEST*
