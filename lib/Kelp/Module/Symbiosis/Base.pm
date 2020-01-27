@@ -3,18 +3,7 @@ package Kelp::Module::Symbiosis::Base;
 use Kelp::Base qw(Kelp::Module);
 use Plack::Util;
 
-attr "-path";
 attr "-middleware" => sub { [] };
-
-sub attach
-{
-	my ($self, $auto) = @_;
-
-	die "error attaching to ecosystem, Kelp cannot mount()"
-		unless $self->app->can("mount");
-
-	return $self->app->mount($self->path, $self, $auto // 0);
-}
 
 sub run
 {
@@ -23,7 +12,7 @@ sub run
 	my $app = $self->psgi(@_);
 	for (@{$self->middleware}) {
 		my ($class, $args) = @$_;
-		# Same middleware loading as Kelp
+		# Same middleware loading procedure as Kelp
 		next if $self->{_loaded_middleware}->{$class}++ && !$ENV{KELP_TESTING};
 
 		my $mw = Plack::Util::load_class($class, "Plack::Middleware");
@@ -41,14 +30,11 @@ sub build
 {
 	my ($self, %args) = @_;
 
-	$self->{path} = $args{path} // $self->path;
 	my $middleware = $self->middleware;
 	foreach my $mw (@{$args{middleware}}) {
 		my $config = $args{middleware_init}{$mw};
 		push @$middleware, [$mw, $config];
 	}
-
-	$self->attach(1);
 }
 
 1;
@@ -83,12 +69,6 @@ This module serves as a base for a Kelp module that is supposed to be ran as a s
 
 =head1 METHODS
 
-=head2 attach
-
-	sig: attach($self, $auto = 0)
-
-Attaches itself into Symbiosis ecosystem using configuration data. $auto flag is used for auto attaching during module building (controlled by Symbiosis configuration)
-
 =head2 run
 
 	sig: run($self)
@@ -105,15 +85,7 @@ By default, this method will throw an exception. It has to be replaced with an a
 
 	sig: build($self, %args)
 
-Standard Kelp module building method. When reimplementing it's best to call parent's implementation, as configuration initialization and application attaching happens in base implementation.
-
-=head2 path
-
-	sig: path($self)
-
-Returns mounting URL path for this application, as specified in config. In child class implementation this can be reimplemented to have a default value like so:
-
-	attr "path" => "/other_app";
+Standard Kelp module building method. When reimplementing it's best to call parent's implementation, as middleware initialization happens in base implementation.
 
 =head2 middleware
 
@@ -123,27 +95,21 @@ Returns an array containing all the middlewares in format: C<[ middleware_class,
 
 =head1 CONFIGURATION
 
-In configuration, a symbiotic module should be specified after I<Symbiosis> to be able to attach itself automatically. Module will complain with exception if it can't find I<mount()> method inside Kelp, but that method does not have to come from Symbiosis.
+example configuration could look like this (for L<Kelp::Module::WebSocket::AnyEvent>):
 
-example configuration could look like this (for L<Kelp::Module::WebSocket>)
-
-	modules => [qw/Symbiosis WebSocket/],
+	modules => [qw/JSON Symbiosis WebSocket::AnyEvent/],
 	modules_init => {
 		Symbiosis => {
-			kelp_path => '/website',
+			automount => 0, # kelp will be mounted manually under different path
 		},
-		WebSocket => {
-			path => '/stream',
+		"WebSocket::AnyEvent" => {
+			serializer => "json",
 			middleware => [qw/Recorder/],
 			middleware_init => {
 				Recorder => { output => "~/recorder.out" },
 			}
 		},
 	}
-
-=head2 path
-
-Mounting point for the application instance.
 
 =head2 middleware, middleware_init
 

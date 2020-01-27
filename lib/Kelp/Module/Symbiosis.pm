@@ -7,8 +7,6 @@ use Scalar::Util qw(blessed);
 
 our $VERSION = '1.00';
 
-attr "-kelp_path" => "/";
-attr "-autoattach" => 1;
 attr "-mounted" => sub { {} };
 
 sub mount
@@ -16,7 +14,7 @@ sub mount
 	my ($self, $path, $app) = @_;
 	my $mounted = $self->mounted;
 
-	carp "Overriding mounting point $path, check config"
+	carp "Overriding mounting point $path"
 		unless !exists $mounted->{$path};
 	$mounted->{$path} = $app;
 	return scalar keys %{$mounted};
@@ -35,7 +33,6 @@ sub run_all
 			unless $app->can("run");
 		$psgi_apps->map($path, $app->run);
 	}
-	$psgi_apps->map($self->kelp_path, $self->app->run);
 
 	return $psgi_apps->to_app;
 }
@@ -43,12 +40,12 @@ sub run_all
 sub build
 {
 	my ($self, %args) = @_;
-	$self->{kelp_path} = $args{kelp_path} // $self->kelp_path;
-	$self->{autoattach} = $args{autoattach} // $self->autoattach;
+	if (!exists $args{automount} || $args{automount}) {
+		$self->mount("/", $self->app);
+	}
 
 	$self->register(
 		symbiosis => $self,
-		mount => sub { shift->symbiosis->mount(@_); },
 		run_all => sub { shift->symbiosis->run_all(@_); },
 	);
 
@@ -64,13 +61,16 @@ Kelp::Module::Symbiosis - manage an entire ecosystem of Plack organisms under Ke
 =head1 SYNOPSIS
 
 	# in configuration file
-	modules => [qw/Symbiosis/],
+	modules => [qw/Symbiosis SomeSymbioticModule/],
 	modules_init => {
 		Symbiosis => {
-			kelp_path => '/myapp', # url path, defaults to '/'
-			autoattach => 1, # boolean, defaults to 1
+			automount => 0, # boolean, defaults to 1
 		},
 	},
+
+	# in kelp application
+	$kelp->symbiosis->mount('/app-path' => $kelp); # only required if automount is 0
+	$kelp->symbiosis->mount('/other-path' => $kelp->some_symbiotic_module);
 
 	# in psgi script
 	my $app = MyApp->new();
@@ -78,15 +78,15 @@ Kelp::Module::Symbiosis - manage an entire ecosystem of Plack organisms under Ke
 
 =head1 DESCRIPTION
 
-This module is an attempt to standardize the way many standalone Plack applications should be ran alongside the Kelp framework. The intended use is to introduce new "organisms" into symbiotic interaction by creating Kelp modules that run I<mount> to attach themselves onto Kelp. Then, the I<run_all> should be invoked in place of Kelp's I<run>, which will construct a L<Plack::App::URLMap> and return it as an application.
+This module is an attempt to standardize the way many standalone Plack applications should be ran alongside the Kelp framework. The intended use is to introduce new "organisms" into symbiotic interaction by creating Kelp modules that are then attached onto Kelp. Then, the I<run_all> should be invoked in place of Kelp's I<run>, which will construct a L<Plack::App::URLMap> and return it as an application.
 
 =head1 METHODS
 
 =head2 mount
 
-	sig: mount($self, $path, $app, $auto = undef)
+	sig: mount($self, $path, $app)
 
-Adds a new $app to the ecosystem under $path. Automatic attachment is marked with $auto and will be rejected if I<autoattach> is set to false.
+Adds a new $app to the ecosystem under $path.
 
 =head2 run_all
 
@@ -106,31 +106,17 @@ Returns a hashref containing a list of mounted modules, keyed with their specifi
 
 Returns an instance of this class.
 
-=head2 mount
-
-Shortcut method, same as C<< symbiosis->mount() >>.
-
-The main reason to introduce this method is to allow other ecosystem managers to emerge if needed. All symbiotic modules should be compatible with the new manager because they won't be using I<< $kelp->symbiosis >> directly.
-
 =head2 run_all
 
 Shortcut method, same as C<< symbiosis->run_all() >>.
 
 =head1 CONFIGURATION
 
-The module should be inserted into Kelp configuration before any other symbiotic module, which will allow automatic mounting during module building. If inserted at the end, these modules will need to be mounted manually by calling I<mount> method with their paths and instances.
+=head2 automount
 
-=head2 kelp_path
+Whether to automatically call I<mount> for the Kelp instance, which will be mounted to root path I</>. Defaults to I<1>.
 
-Mounting point for the base Kelp instance. Defaults to root I<'/'>, which will usually be the case.
-
-=head2 autoattach
-
-Whether to automatically call I<mount> for all the modules which will check for it. All modules extending L<Kelp::Module::Symbiosis::Base> will check for this and mount themselves based on this flag. Defaults to I<1>.
-
-If you set this to I<0> you will have to run something like C<< $kelp->mount($mount_path, $kelp->module); >> in Kelp's I<build> method, for each module you want to be a part of the ecosystem. Modules inheriting from the base symbiosis class introduce a convenience method I<attach>, which allows to write C<< $kelp->module->attach(); >>.
-
-Note that the main Kelp instance is always a part of the ecosystem and therefore will always be run with I<run_all> regardless of this flag's value.
+If you set this to I<0> you will have to run something like C<< $kelp->symbiosis->mount($mount_path, $kelp); >> in Kelp's I<build> method. This will allow other paths than root path for the base Kelp application, if needed.
 
 =head1 REQUIREMENTS FOR MODULES
 
@@ -144,7 +130,7 @@ The I<run> method should return a psgi application ready to be ran by the Server
 
 =item L<Kelp::Module::Symbiosis::Base>, a base for symbiotic modules
 
-=item L<Kelp::Module::Websocket>, a reference symbiotic module
+=item L<Kelp::Module::Websocket::AnyEvent>, a reference symbiotic module
 
 =item L<Plack::App::URLMap>, Plack URL mapper application
 
