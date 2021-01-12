@@ -47,13 +47,13 @@ $t->request(GET "/kelp/test")
 
 $t->request(GET "/test")
 	->code_is(200)
-	->header_is("Content-MD5", "81c4e3af4002170ab76fe2e53488b6a4")
-	->content_is("mounted");
+	->header_is("Content-MD5", "d7a414cac18f91e2de29b206f0ac1c21")
+	->content_is("mounted1");
 
 $t->request(GET "/test/test")
 	->code_is(200)
-	->header_is("Content-MD5", "81c4e3af4002170ab76fe2e53488b6a4")
-	->content_is("mounted");
+	->header_is("Content-MD5", "d7a414cac18f91e2de29b206f0ac1c21")
+	->content_is("mounted1");
 
 $t->request(GET "/kelp/kelp")
 	->code_is(404);
