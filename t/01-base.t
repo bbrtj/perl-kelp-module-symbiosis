@@ -27,7 +27,7 @@ use Kelp::Module::Symbiosis::Test;
 {
 	package Symbiosis::Test;
 
-	use Kelp::Less;
+	use Kelp::Less config_module => 'Kelp::Module::Config::Null';
 
 	module "Symbiosis", automount => 0;
 	app->symbiosis->mount("/kelp", app);
