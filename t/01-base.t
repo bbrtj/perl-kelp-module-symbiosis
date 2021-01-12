@@ -5,23 +5,8 @@ use Test::More;
 use Kelp::Test;
 use HTTP::Request::Common;
 use Kelp::Module::Symbiosis::Test;
-
-# Some module that can be served by Plack via run()
-# extending Symbiosis::Base
-{
-	package TestModule;
-	use Kelp::Base qw(Kelp::Module::Symbiosis::Base);
-	use Plack::Response;
-
-	sub psgi
-	{
-		return sub {
-			my $res = Plack::Response->new(200);
-			$res->body("mounted");
-			return $res->finalize;
-		};
-	}
-}
+use File::Basename;
+use lib dirname(__FILE__) . '/lib';
 
 # Kelp module being tested
 {
@@ -30,10 +15,10 @@ use Kelp::Module::Symbiosis::Test;
 	use Kelp::Less config_module => 'Kelp::Module::Config::Null';
 
 	module "Symbiosis", automount => 0;
+	module "+TestSymbiont", middleware => [qw(ContentMD5)];
+
 	app->symbiosis->mount("/kelp", app);
-	my $module = TestModule->new(app => app);
-	$module->build(middleware => [qw(ContentMD5)]);
-	app->symbiosis->mount("/test", $module);
+	app->symbiosis->mount("/test", app->testmod);
 
 	route "/test" => sub {
 		"kelp";
