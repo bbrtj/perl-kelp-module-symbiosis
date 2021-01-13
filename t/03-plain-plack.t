@@ -7,6 +7,7 @@ use HTTP::Request::Common;
 use Kelp::Module::Symbiosis::Test;
 
 {
+
 	package Plain::Test;
 
 	use Kelp::Less config_module => 'Kelp::Module::Config::Null';

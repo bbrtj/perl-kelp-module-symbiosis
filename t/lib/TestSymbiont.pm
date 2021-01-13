@@ -24,16 +24,20 @@ sub build
 	my ($self, %args) = @_;
 	$self->SUPER::build(%args);
 
-	$self->register(testmod => sub {
-		return $self;
-	});
+	$self->register(
+		testmod => sub {
+			return $self;
+		}
+	);
 
 	my $max_num = $self->num;
-	$self->register(another => sub {
-		my $another = __PACKAGE__->new(app => $self->app, num => ++$max_num);
-		$another->SUPER::build(%args);
-		return $another;
-	});
+	$self->register(
+		another => sub {
+			my $another = __PACKAGE__->new(app => $self->app, num => ++$max_num);
+			$another->SUPER::build(%args);
+			return $another;
+		}
+	);
 }
 
 1;

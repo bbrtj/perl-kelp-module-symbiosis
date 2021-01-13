@@ -44,7 +44,7 @@ sub run
 			$psgi_apps->map($path, $app);
 		}
 		else {
-			croak "$error mount point $path is not an object"
+			croak "$error mount point $path is not an object";
 		}
 	}
 

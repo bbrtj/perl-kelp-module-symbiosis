@@ -14,6 +14,7 @@ sub run
 	my $app = $self->psgi(@_);
 	for (@{$self->middleware}) {
 		my ($class, $args) = @$_;
+
 		# Same middleware loading procedure as Kelp
 		next if $self->{_loaded_middleware}->{$class}++ && !$ENV{KELP_TESTING};
 

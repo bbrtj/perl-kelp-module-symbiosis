@@ -11,7 +11,8 @@ sub run
 	shift->app->run_all(@_);
 }
 
-sub AUTOLOAD {
+sub AUTOLOAD
+{
 	my ($self) = shift;
 
 	my $func = our $AUTOLOAD;

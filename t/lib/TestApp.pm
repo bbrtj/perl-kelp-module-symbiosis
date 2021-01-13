@@ -1,7 +1,8 @@
 package TestApp;
 use Kelp::Base 'Kelp';
 
-sub build {
+sub build
+{
 	my $self = shift;
 	my $r = $self->routes;
 
@@ -11,8 +12,9 @@ sub build {
 	$self->symbiosis->mount('/test/test', $self->another);
 }
 
-sub home {
-	'this is home'
+sub home
+{
+	'this is home';
 }
 
 1;

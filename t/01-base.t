@@ -10,6 +10,7 @@ use lib dirname(__FILE__) . '/lib';
 
 # Kelp module being tested
 {
+
 	package Symbiosis::Test;
 
 	use Kelp::Less config_module => 'Kelp::Module::Config::Null';

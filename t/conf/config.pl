@@ -1,6 +1,6 @@
 # Common settings
 {
-	modules      => [qw/Symbiosis +TestSymbiont/],
+	modules => [qw/Symbiosis +TestSymbiont/],
 	modules_init => {
 	}
 };
