@@ -25,7 +25,7 @@ sub run
 
 sub psgi
 {
-	die "psgi needs to be reimplemented";
+	die __PACKAGE__ . " - psgi needs to be reimplemented";
 }
 
 sub build
