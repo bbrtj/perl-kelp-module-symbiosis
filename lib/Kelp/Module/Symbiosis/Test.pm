@@ -28,7 +28,7 @@ __END__
 
 =head1 NAME
 
-Kelp::Module::Symbiosis::Test - allow testing symbiotic environments using Kelp::Test
+Kelp::Module::Symbiosis::Test - Allow testing symbiotic environments using Kelp::Test
 
 =head1 SYNOPSIS
 

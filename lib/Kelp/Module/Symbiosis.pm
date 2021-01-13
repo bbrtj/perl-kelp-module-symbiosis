@@ -70,7 +70,7 @@ __END__
 
 =head1 NAME
 
-Kelp::Module::Symbiosis - manage an entire ecosystem of Plack organisms under Kelp
+Kelp::Module::Symbiosis - Manage an entire ecosystem of Plack organisms under Kelp
 
 =head1 SYNOPSIS
 
@@ -83,7 +83,7 @@ Kelp::Module::Symbiosis - manage an entire ecosystem of Plack organisms under Ke
 	},
 
 	# in kelp application
-	$kelp->symbiosis->mount('/app-path' => $kelp); # only required if automount is 0
+	$kelp->symbiosis->mount('/app-path' => $kelp); # only required if config 'automount' is explicitly false
 	$kelp->symbiosis->mount('/other-path' => $kelp->some_symbiotic_module);
 
 	# in psgi script
@@ -92,7 +92,55 @@ Kelp::Module::Symbiosis - manage an entire ecosystem of Plack organisms under Ke
 
 =head1 DESCRIPTION
 
-This module is an attempt to standardize the way many standalone Plack applications should be ran alongside the Kelp framework. The intended use is to introduce new "organisms" into symbiotic interaction by creating Kelp modules that are then attached onto Kelp. Then, the I<run_all> should be invoked in place of Kelp's I<run>, which will construct a L<Plack::App::URLMap> and return it as an application.
+This module is an attempt to standardize the way many standalone Plack applications should be ran alongside the Kelp framework. The intended use is to introduce new "organisms" into symbiotic interaction by creating Kelp modules that are then attached onto Kelp. Then, the added method I<run_all> should be invoked in place of Kelp's I<run>, which will construct a L<Plack::App::URLMap> and return it as an application.
+
+=head2 Why not just use Plack::Builder in a .psgi script?
+
+One reason is not to put too much logic into .psgi script. It my opinion a framework should be capable enough not to make adding an additional application feel like a hack. This is of course subjective.
+
+The main functional reason to use this module is the ability to access the Kelp application instance inside another Plack application. If that application is configurable, it can be configured to call Kelp methods. This way, Kelp can become a glue for multiple standalone Plack applications, the central point of a Plack mixture:
+
+	# in Symbiont's Kelp module (extends Kelp::Module::Symbiosis::Base)
+
+	sub psgi {
+		my ($self) = @_;
+
+		my $app = Some::Plack::App->new(
+			on_something => sub {
+				my $kelp = $self->app; # we can access Kelp!
+				$kelp->something_happened;
+			},
+		);
+
+		return $app->to_app;
+	}
+
+	# in Kelp application class
+
+	sub something_happened {
+		... # handle another app's signal
+	}
+
+	sub build {
+		my ($kelp) = @_;
+
+		my $another_app = $kelp->get_another_app;
+		$kelp->symbiosis->mount('/app' => $another_app);
+	}
+
+=head2 What can be mounted?
+
+The sole requirement for a module to be mounted into Symbiosis is its ability to I<run()>, returning the psgi application. A module also needs to be a blessed reference, of course. Fun fact: Symbiosis module itself meets that requirements, so one symbiotic app can be mounted inside another.
+
+It can also be just a plain psgi app, which happens to be a code reference.
+
+Whichever it is, it should be a psgi application ready to be ran by the server, wrapped in all the needed middlewares. This is made easier with L<Kelp::Module::Symbiosis::Base>, which allows you to add symbionts in the configuration for Kelp along with the middlewares. Because of this, this should be a preferred way of defining symbionts.
+
+For very simple use cases, this will work though:
+
+	# in application build method
+	my $some_app = SomePlackApp->new()->to_app;
+	$self->symbiosis->mount('/path', $some_app);
 
 =head1 METHODS
 
@@ -136,21 +184,19 @@ Whether to automatically call I<mount> for the Kelp instance, which will be moun
 
 If you set this to I<0> you will have to run something like C<< $kelp->symbiosis->mount($mount_path, $kelp); >> in Kelp's I<build> method. This will allow other paths than root path for the base Kelp application, if needed.
 
-=head1 REQUIREMENTS FOR MODULES
+=head1 CAVEATS
 
-The sole requirement for a module to be mounted into Symbiosis is its ability to I<run()>. A module also needs to be a blessed reference, of course.
-
-The I<run> method should return a psgi application ready to be ran by the Server, wrapped in all the needed middlewares. See L<Kelp::Module::Symbiosis::Base> for a preferred base class for these modules.
+Routes specified in symbiosis will be matched before routes in Kelp. Once you mount something under I</api> for example, you will no longer be able to specify Kelp route for anything under I</api>.
 
 =head1 SEE ALSO
 
 =over 2
 
-=item L<Kelp::Module::Symbiosis::Base>, a base for symbiotic modules
+=item * L<Kelp::Module::Symbiosis::Base>, a base for symbiotic modules
 
-=item L<Kelp::Module::Websocket::AnyEvent>, a reference symbiotic module
+=item * L<Kelp::Module::Websocket::AnyEvent>, a reference symbiotic module
 
-=item L<Plack::App::URLMap>, Plack URL mapper application
+=item * L<Plack::App::URLMap>, Plack URL mapper application
 
 =back
 
