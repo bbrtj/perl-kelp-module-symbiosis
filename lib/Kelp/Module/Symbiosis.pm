@@ -23,6 +23,14 @@ sub mount
 sub run_all
 {
 	my ($self) = shift;
+
+	warn __PACKAGE__ . '->run_all is deprecated, please use ' . __PACKAGE__ . ' run instead';
+	return $self->run(@_);
+}
+
+sub run
+{
+	my ($self) = shift;
 	my $psgi_apps = Plack::App::URLMap->new;
 
 	my $error = "Cannot start the ecosystem:";
@@ -37,12 +45,6 @@ sub run_all
 	return $psgi_apps->to_app;
 }
 
-sub run
-{
-	my ($self) = shift;
-	return $self->run_all(@_);
-}
-
 sub build
 {
 	my ($self, %args) = @_;
@@ -52,7 +54,7 @@ sub build
 
 	$self->register(
 		symbiosis => $self,
-		run_all => sub { shift->symbiosis->run_all(@_); },
+		run_all => sub { shift->symbiosis->run(@_); },
 	);
 
 }
@@ -98,6 +100,10 @@ Adds a new $app to the ecosystem under $path.
 
 	sig: run_all($self)
 
+DEPRECATED: use L</run> instead.
+
+=head2 run
+
 Constructs and returns a new L<Plack::App::URLMap> with all the mounted modules and Kelp itself.
 
 =head2 mounted
@@ -114,7 +120,7 @@ Returns an instance of this class.
 
 =head2 run_all
 
-Shortcut method, same as C<< symbiosis->run_all() >>.
+Shortcut method, same as C<< $kelp->symbiosis->run() >>.
 
 =head1 CONFIGURATION
 
