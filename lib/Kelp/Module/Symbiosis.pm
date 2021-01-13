@@ -35,11 +35,17 @@ sub run
 
 	my $error = "Cannot start the ecosystem:";
 	while (my ($path, $app) = each %{$self->mounted}) {
-		croak "$error mount point $path is not an object"
-			unless blessed $app;
-		croak "$error application mounted under $path cannot run()"
-			unless $app->can("run");
-		$psgi_apps->map($path, $app->run(@_));
+		if (blessed $app) {
+			croak "$error application mounted under $path cannot run()"
+				unless $app->can("run");
+			$psgi_apps->map($path, $app->run(@_));
+		}
+		elsif (ref $app eq 'CODE') {
+			$psgi_apps->map($path, $app);
+		}
+		else {
+			croak "$error mount point $path is not an object"
+		}
 	}
 
 	return $psgi_apps->to_app;
