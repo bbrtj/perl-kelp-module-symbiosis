@@ -1,5 +1,7 @@
 package Kelp::Module::Symbiosis::Base;
 
+our $VERSION = '1.01';
+
 use Kelp::Base qw(Kelp::Module);
 use Plack::Util;
 

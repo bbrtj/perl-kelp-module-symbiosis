@@ -1,11 +1,11 @@
 package Kelp::Module::Symbiosis;
 
+our $VERSION = '1.01';
+
 use Kelp::Base qw(Kelp::Module);
 use Plack::App::URLMap;
 use Carp;
 use Scalar::Util qw(blessed);
-
-our $VERSION = '1.00';
 
 attr "-mounted" => sub { {} };
 

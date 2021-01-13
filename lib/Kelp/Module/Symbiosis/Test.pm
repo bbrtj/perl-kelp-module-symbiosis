@@ -1,5 +1,7 @@
 package Kelp::Module::Symbiosis::Test;
 
+our $VERSION = '1.01';
+
 use Kelp::Base;
 
 attr "-app" => sub { die "`app` parameter is required" };
