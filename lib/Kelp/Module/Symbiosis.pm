@@ -166,7 +166,7 @@ Whichever it is, it should be a psgi application ready to be ran by the server, 
 For very simple use cases, this will work though:
 
 	# in application build method
-	my $some_app = SomePlackApp->new()->to_app;
+	my $some_app = SomePlackApp->new->to_app;
 	$self->symbiosis->mount('/path', $some_app);
 
 =head1 METHODS
@@ -197,7 +197,7 @@ A string - will try finding a symbiotic module with that name and mounting it. S
 
 	sig: run_all($self)
 
-I<DEPRECATED in 1.10: use L</run> instead. ETA on removal is no less than three months>
+I<DEPRECATED in 1.01 use L</run> instead. ETA on removal is no less than three months>
 
 =head2 run
 
@@ -207,7 +207,7 @@ Constructs and returns a new L<Plack::App::URLMap> with all the mounted modules 
 
 	sig: mounted($self)
 
-Returns a hashref containing a list of mounted modules, keyed with their specified mount paths.
+Returns a hashref containing a list of mounted modules, keyed by their specified mount paths.
 
 =head2 loaded
 
@@ -215,7 +215,7 @@ Returns a hashref containing a list of mounted modules, keyed with their specifi
 
 I<new in 1.10>
 
-Returns a hashref containing a list of loaded modules, keyed with their specified mount paths.
+Returns a hashref containing a list of loaded modules, keyed by their names.
 
 A module is loaded once it is added to Kelp configuration. This can be used to access a module that does not introduce new methods to Kelp.
 
@@ -247,7 +247,7 @@ Symbiosis should be the first of the symbiotic modules specified in your Kelp co
 
 =head2 automount
 
-I<DEPRECATED in 1.10: use L</mount> instead. ETA on removal is no less than three months>
+I<DEPRECATED in 1.10: use L<mount|/mount1> instead. ETA on removal is no less than three months>
 
 Whether to automatically call I<mount> for the Kelp instance, which will be mounted to root path I</>. Defaults to I<1>.
 

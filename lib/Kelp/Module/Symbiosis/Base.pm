@@ -132,7 +132,7 @@ example configuration could look like this (for L<Kelp::Module::WebSocket::AnyEv
 	modules => [qw/JSON Symbiosis WebSocket::AnyEvent/],
 	modules_init => {
 		Symbiosis => {
-			automount => 0, # kelp will be mounted manually under different path
+			mount => undef, # kelp will be mounted manually under different path
 		},
 		"WebSocket::AnyEvent" => {
 			serializer => "json",
