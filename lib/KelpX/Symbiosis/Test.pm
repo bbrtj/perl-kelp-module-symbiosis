@@ -1,6 +1,6 @@
 package KelpX::Symbiosis::Test;
 
-our $VERSION = '1.01';
+our $VERSION = '1.10';
 
 use Kelp::Base;
 use Kelp::Test;
@@ -56,8 +56,10 @@ This module allows testing Kelp apps with Symbiosis using L<Kelp::Test>. The pro
 
 =head2 wrap
 
+I<new in 1.10>
+
 Instead of using I<Kelp::Test::new> use I<KelpX::Symbiosis::Test::wrap> with the same interface. Then you can create test cases not only for Kelp routes but also for the rest of Plack applications. The I<wrap> method will return a L<Kelp::Test> object, so refer to its documentation for more details.
 
-=head1 How it works
+=head1 HOW DOES IT WORK?
 
 The main Kelp instance is wrapped in this module class and the resulting object is passed into Kelp::Test instead. I<KelpX::Symbiosis::Test> autoloads Kelp methods and wraps I<run_all> inside I<run>, which allows L<Kelp::Test> to use it.

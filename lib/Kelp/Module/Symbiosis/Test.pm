@@ -1,6 +1,6 @@
 package Kelp::Module::Symbiosis::Test;
 
-our $VERSION = '1.01';
+our $VERSION = '1.10';
 
 use Kelp::Base 'KelpX::Symbiosis::Test';
 
