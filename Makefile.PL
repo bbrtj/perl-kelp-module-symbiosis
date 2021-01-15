@@ -29,4 +29,6 @@ WriteMakefile(
 	ABSTRACT_FROM => 'lib/Kelp/Module/Symbiosis.pm',
 	AUTHOR => 'Bartosz Jarzyna <brtastic.dev@gmail.com>',
 	LICENSE => 'perl',
+
+	test => {TESTS => 't/*.t t/*/*.t'},
 );

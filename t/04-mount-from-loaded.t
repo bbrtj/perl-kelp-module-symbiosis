@@ -7,14 +7,9 @@ use KelpX::Symbiosis::Test;
 use lib 't/lib';
 use TestApp;
 
-my $app = TestApp->new(mode => 'mostly_mounted');
-$app->build_from_methods;
+my $app = TestApp->new(mode => 'none_mounted');
 my $t = KelpX::Symbiosis::Test->wrap(app => $app);
-
-my $loaded = $app->symbiosis->loaded;
-is scalar keys %$loaded, 2, "loaded count ok";
-isa_ok $loaded->{"symbiont"}, "TestSymbiont";
-isa_ok $loaded->{"AnotherTestSymbiont"}, "AnotherTestSymbiont";
+$app->build_from_loaded;
 
 $t->request(GET "/s/home")
 	->code_is(200)
