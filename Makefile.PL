@@ -13,8 +13,8 @@ WriteMakefile(
 	},
 
 	PREREQ_PM => {
-		'Kelp' => '1',
-		'Plack' => '1',
+		'Kelp' => 0,
+		'Plack' => 0,
 	},
 
 	META_MERGE => {
