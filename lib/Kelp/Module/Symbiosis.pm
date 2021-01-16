@@ -255,7 +255,7 @@ Symbiosis should be the first of the symbiotic modules specified in your Kelp co
 
 =head2 automount
 
-I<DEPRECATED in 1.10: use L<mount|/mount1> instead. ETA on removal is no less than three months>
+I<DEPRECATED in 1.10: use 'mount' instead. ETA on removal is no less than three months>
 
 Whether to automatically call I<mount> for the Kelp instance, which will be mounted to root path I</>. Defaults to I<1>.
 
