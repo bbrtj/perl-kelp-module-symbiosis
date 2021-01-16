@@ -55,7 +55,7 @@ sub run
 {
 	my ($self) = shift;
 	my $psgi_apps = Plack::App::URLMap->new;
-	my %addrs; # apps keyed by refaddr
+	my %addrs;    # apps keyed by refaddr
 
 	my $error = "Symbiosis: cannot start the ecosystem because";
 	while (my ($path, $app) = each %{$self->mounted}) {
