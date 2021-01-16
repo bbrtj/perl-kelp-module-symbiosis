@@ -9,6 +9,7 @@ Revision history for Perl extension Kelp::Module::Symbiosis.
 	- child modules now register themselves into 'loaded' method (hash)
 	- child modules can now specify 'mount' in their config
 	- 'mount' method now also allows mounting modules by their name
+	- mounting the same object in many paths will now only call its 'run' once
 	- update and improve test cases
 	- maintenance work
 

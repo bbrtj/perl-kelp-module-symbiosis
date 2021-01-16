@@ -4,8 +4,7 @@ use warnings;
 use Test::More;
 use HTTP::Request::Common;
 use KelpX::Symbiosis::Test;
-use File::Basename;
-use lib dirname(__FILE__) . '/lib';
+use lib 't/lib';
 
 # Kelp module being tested
 {

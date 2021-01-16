@@ -5,7 +5,7 @@ our $VERSION = '1.10';
 use Kelp::Base qw(Kelp::Module);
 use Plack::App::URLMap;
 use Carp;
-use Scalar::Util qw(blessed);
+use Scalar::Util qw(blessed refaddr);
 
 attr "-mounted" => sub { {} };
 attr "-loaded" => sub { {} };
@@ -55,13 +55,19 @@ sub run
 {
 	my ($self) = shift;
 	my $psgi_apps = Plack::App::URLMap->new;
+	my %addrs; # apps keyed by refaddr
 
-	my $error = "Cannot start the ecosystem:";
+	my $error = "Symbiosis: cannot start the ecosystem because";
 	while (my ($path, $app) = each %{$self->mounted}) {
 		if (blessed $app) {
 			croak "$error application mounted under $path cannot run()"
 				unless $app->can("run");
-			$psgi_apps->map($path, $app->run(@_));
+
+			# cache the ran application so that it won't be ran twice
+			my $addr = refaddr $app;
+			my $ran = $addrs{$addr} //= $app->run(@_);
+
+			$psgi_apps->map($path, $ran);
 		}
 		elsif (ref $app eq 'CODE') {
 			$psgi_apps->map($path, $app);
@@ -202,6 +208,8 @@ I<DEPRECATED in 1.01 use L</run> instead. ETA on removal is no less than three m
 =head2 run
 
 Constructs and returns a new L<Plack::App::URLMap> with all the mounted modules and Kelp itself.
+
+Note: it will not run mounted object twice. This means that it is safe to mount something in two paths at once, and it will just be an alias to the same application.
 
 =head2 mounted
 
