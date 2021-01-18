@@ -19,6 +19,18 @@ sub run
 	shift->app->run_all(@_);
 }
 
+sub can
+{
+	my ($self, $func) = @_;
+
+	if (ref $self) {
+		my $can = $self->app->can($func);
+		return $can if defined $can;
+	}
+
+	return $self->SUPER::can($func);
+}
+
 sub AUTOLOAD
 {
 	my ($self) = shift;
