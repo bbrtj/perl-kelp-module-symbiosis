@@ -8,9 +8,11 @@ use Carp;
 use Scalar::Util qw(blessed refaddr);
 use Plack::Middleware::Conditional;
 use Plack::Util;
+use Kelp::Module::Symbiosis::_Util;
 
 attr -mounted => sub { {} };
 attr -loaded => sub { {} };
+attr -middleware => sub { [] };
 attr reverse_proxy => 0;
 
 sub mount
@@ -72,7 +74,8 @@ sub run
 		}
 	}
 
-	return $self->_reverse_proxy_wrap($psgi_apps->to_app);
+	my $wrapped = Kelp::Module::Symbiosis::_Util::wrap($self, $psgi_apps->to_app);
+	return $self->_reverse_proxy_wrap($wrapped);
 }
 
 sub _reverse_proxy_wrap
@@ -101,6 +104,8 @@ sub build
 	if ($args{reverse_proxy}) {
 		$self->reverse_proxy(1);
 	}
+
+	Kelp::Module::Symbiosis::_Util::load_middleware($self, %args);
 
 	$self->register(
 		symbiosis => $self,
@@ -267,6 +272,10 @@ A path to mount the Kelp instance, which defaults to I<'/'>. Specify a string if
 I<new in 1.11>
 
 A boolean flag (I<1/0>) which enables reverse proxy for all the Plack apps at once. Requires L<Plack::Middleware::ReverseProxy> to be installed.
+
+=head2 middleware, middleware_init
+
+Middleware specs for the entire ecosystem. Every application mounted in Symbiosis will be wrapped in these middleware. They are configured exactly the same as middlewares in Kelp. Regular Kelp middleware will be used just for the Kelp application, so if you want to wrap all of them at once, this is the place to do it.
 
 =head1 CAVEATS
 
