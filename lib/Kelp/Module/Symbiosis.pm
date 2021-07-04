@@ -46,14 +46,6 @@ sub _link
 	return scalar keys %{$loaded};
 }
 
-sub run_all
-{
-	my ($self) = shift;
-
-	warn 'Symbiosis: run_all method is deprecated, use run instead';
-	return $self->run(@_);
-}
-
 sub run
 {
 	my ($self) = shift;
@@ -102,10 +94,7 @@ sub build
 	$args{mount} //= '/'
 		unless exists $args{mount};
 
-	warn 'Symbiosis: automount configuration is deprecated, use mount instead'
-		if exists $args{automount};
-
-	if ($args{mount} && (!exists $args{automount} || $args{automount})) {
+	if ($args{mount}) {
 		$self->mount($args{mount}, $self->app);
 	}
 
@@ -219,12 +208,6 @@ A string - will try finding a symbiotic module with that name and mounting it. S
 
 =back
 
-=head2 run_all
-
-	sig: run_all($self)
-
-I<DEPRECATED in 1.01 use L</run> instead. ETA on removal is no less than three months>
-
 =head2 run
 
 Constructs and returns a new L<Plack::App::URLMap> with all the mounted modules and Kelp itself.
@@ -273,27 +256,17 @@ Shortcut method, same as C<< $kelp->symbiosis->run() >>.
 
 Symbiosis should be the first of the symbiotic modules specified in your Kelp configuration. Failure to meet this requirement will cause your application to crash immediately.
 
-=head2 automount
-
-I<DEPRECATED in 1.10: use 'mount' instead. ETA on removal is no less than three months>
-
-Whether to automatically call I<mount> for the Kelp instance, which will be mounted to root path I</>. Defaults to I<1>.
-
-If you set this to I<0> you will have to run something like C<< $kelp->symbiosis->mount($mount_path, $kelp); >> in Kelp's I<build> method. This will allow other paths than root path for the base Kelp application, if needed.
-
 =head2 mount
 
 I<new in 1.10>
 
 A path to mount the Kelp instance, which defaults to I<'/'>. Specify a string if you wish a to use different path. Specify an I<undef> or empty string to avoid mounting at all - you will have to run something like C<< $kelp->symbiosis->mount($mount_path, $kelp); >> in Kelp's I<build> method.
 
-Collides with now deprecated L</automount> - if you specify both, automount will control if the app will be mounted where the I<mount> points to.
-
 =head2 reverse_proxy
 
 I<new in 1.11>
 
-A boolean flag (I<1/0>) which enables reverse proxy for all the Plack apps at once. Requires L<Plack::Middleware::ReverseProxy> to be installed. This feature is experimental.
+A boolean flag (I<1/0>) which enables reverse proxy for all the Plack apps at once. Requires L<Plack::Middleware::ReverseProxy> to be installed.
 
 =head1 CAVEATS
 
