@@ -1,6 +1,6 @@
 package Kelp::Module::Symbiosis;
 
-our $VERSION = '1.11';
+our $VERSION = '1.12';
 
 use Kelp::Base qw(Kelp::Module);
 use Plack::App::URLMap;
@@ -275,7 +275,9 @@ A boolean flag (I<1/0>) which enables reverse proxy for all the Plack apps at on
 
 =head2 middleware, middleware_init
 
-Middleware specs for the entire ecosystem. Every application mounted in Symbiosis will be wrapped in these middleware. They are configured exactly the same as middlewares in Kelp. Regular Kelp middleware will be used just for the Kelp application, so if you want to wrap all of them at once, this is the place to do it.
+I<new in 1.12>
+
+Middleware specs for the entire ecosystem. Every application mounted in Symbiosis will be wrapped in these middleware. They are configured exactly the same as middlewares in Kelp. Regular Kelp middleware will be used just for the Kelp application, so if you want to wrap all symbionts at once, this is the place to do it.
 
 =head1 CAVEATS
 
