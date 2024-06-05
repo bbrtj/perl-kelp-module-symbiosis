@@ -4,12 +4,17 @@ use warnings;
 use Test::More;
 use HTTP::Request::Common;
 use KelpX::Symbiosis::Test;
-use lib 't/lib';
+use lib 't/compat/lib';
 use TestApp;
 
-my $app = TestApp->new(mode => 'none_mounted');
+my $app = TestApp->new(mode => 'mostly_mounted');
+$app->build_from_methods;
 my $t = KelpX::Symbiosis::Test->wrap(app => $app);
-$app->build_from_loaded;
+
+my $loaded = $app->symbiosis->loaded;
+is scalar keys %$loaded, 2, "loaded count ok";
+isa_ok $loaded->{"symbiont"}, "TestSymbiont";
+isa_ok $loaded->{"AnotherTestSymbiont"}, "AnotherTestSymbiont";
 
 $t->request(GET "/s/home")
 	->code_is(200)

@@ -1,7 +1,7 @@
 package Kelp::Module::Symbiosis::Base;
 
 use Kelp::Base qw(Kelp::Module);
-use Kelp::Module::Symbiosis::_Util;
+use KelpX::Symbiosis::_Util;
 
 attr -middleware => sub { [] };
 
@@ -14,7 +14,7 @@ sub run
 	my ($self) = shift;
 
 	my $app = $self->psgi(@_);
-	return Kelp::Module::Symbiosis::_Util::wrap($self, $app);
+	return KelpX::Symbiosis::_Util::wrap($self, $app);
 }
 
 sub psgi
@@ -29,7 +29,7 @@ sub build
 	die 'Kelp::Module::Symbiosis needs to be loaded before ' . ref $self
 		unless $self->app->can('symbiosis');
 
-	Kelp::Module::Symbiosis::_Util::load_middleware($self, %args);
+	KelpX::Symbiosis::_Util::load_middleware($self, %args);
 
 	$self->app->symbiosis->_link($self->name, $self, $args{mount});
 	return;

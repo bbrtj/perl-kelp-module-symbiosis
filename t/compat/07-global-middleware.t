@@ -4,7 +4,7 @@ use warnings;
 use Test::More;
 use HTTP::Request::Common;
 use KelpX::Symbiosis::Test;
-use lib 't/lib';
+use lib 't/compat/lib';
 
 # Kelp module being tested
 {
@@ -47,3 +47,4 @@ $t->request(GET "/test")
 	->content_is("mounted");
 
 done_testing;
+

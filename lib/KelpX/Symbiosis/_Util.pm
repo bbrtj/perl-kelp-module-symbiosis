@@ -1,7 +1,6 @@
-package Kelp::Module::Symbiosis::_Util;
+package KelpX::Symbiosis::_Util;
 
-use v5.10;
-use warnings;
+use Kelp::Base -strict;
 use Plack::Util;
 
 sub wrap
