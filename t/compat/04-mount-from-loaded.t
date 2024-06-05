@@ -4,10 +4,10 @@ use warnings;
 use Test::More;
 use HTTP::Request::Common;
 use KelpX::Symbiosis::Test;
-use lib 't/compat/lib';
-use TestApp;
+use lib 't/lib';
+use TestAppCompat;
 
-my $app = TestApp->new(mode => 'none_mounted');
+my $app = TestAppCompat->new(mode => 'none_mounted');
 my $t = KelpX::Symbiosis::Test->wrap(app => $app);
 $app->build_from_loaded;
 

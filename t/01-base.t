@@ -3,7 +3,7 @@ use warnings;
 
 use Test::More;
 use HTTP::Request::Common;
-use KelpX::Symbiosis::Test;
+use Kelp::Test;
 use lib 't/lib';
 
 # Kelp module being tested
@@ -11,27 +11,25 @@ use lib 't/lib';
 
 	package Symbiosis::Test;
 
-	use Kelp::Less;
+	use Kelp::Base 'KelpX::Symbiosis';
 
-	module "Symbiosis", mount => undef;
-	module "+TestSymbiont", middleware => [qw(ContentMD5)];
-
-	app->symbiosis->mount("/kelp", app);
-	app->symbiosis->mount("/test", app->testmod);
-
-	route "/test" => sub {
-		"kelp";
-	};
-
-	sub get_app
+	sub build
 	{
-		return app;
+		my $self = shift;
+		$self->load_module("+TestSymbiont", middleware => [qw(ContentMD5)]);
+
+		$self->symbiosis->mount("/kelp", $self);
+		$self->symbiosis->mount("/test", $self->testmod);
+
+		$self->add_route("/test" => sub {
+			"kelp";
+		});
 	}
 
 	1;
 }
 
-my $app = Symbiosis::Test::get_app;
+my $app = Symbiosis::Test->new(mode => 'no_mount');
 can_ok $app, qw(symbiosis run_all testmod);
 is $app->symbiosis->reverse_proxy, 0, 'reverse proxy status ok';
 
@@ -47,7 +45,7 @@ my $loaded = $symbiosis->loaded;
 is scalar keys %$loaded, 1, "loaded count ok";
 isa_ok $loaded->{"symbiont"}, "TestSymbiont";
 
-my $t = KelpX::Symbiosis::Test->wrap(app => $app);
+my $t = Kelp::Test->new(app => $app);
 
 $t->request(GET "/kelp/test")
 	->code_is(200)

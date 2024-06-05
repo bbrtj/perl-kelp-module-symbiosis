@@ -1,4 +1,4 @@
-package CountingApp;
+package CountingAppCompat;
 use Kelp::Base 'Kelp';
 
 my $ran_times = 0;
@@ -33,3 +33,4 @@ sub home
 }
 
 1;
+

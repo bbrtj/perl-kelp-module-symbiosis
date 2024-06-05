@@ -1,4 +1,4 @@
-package TestApp;
+package TestAppCompat;
 use Kelp::Base 'Kelp';
 
 sub build
@@ -30,3 +30,4 @@ sub home
 }
 
 1;
+

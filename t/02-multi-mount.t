@@ -3,13 +3,13 @@ use warnings;
 
 use Test::More;
 use HTTP::Request::Common;
-use KelpX::Symbiosis::Test;
+use Kelp::Test;
 use lib 't/lib';
-use TestAppCompat;
+use TestApp;
 
-my $app = TestAppCompat->new(mode => 'mostly_mounted');
+my $app = TestApp->new(mode => 'mostly_mounted');
 $app->build_from_methods;
-my $t = KelpX::Symbiosis::Test->wrap(app => $app);
+my $t = Kelp::Test->new(app => $app);
 
 my $loaded = $app->symbiosis->loaded;
 is scalar keys %$loaded, 2, "loaded count ok";

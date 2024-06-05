@@ -3,14 +3,26 @@ package KelpX::Symbiosis;
 use Kelp::Base qw(Kelp);
 use KelpX::Symbiosis::Adapter;
 
-attr -symbiosis => sub { KelpX::Symbiosis::Adapter->new(app => $_[0]->app) };
+# NOTE: circular reference
+attr -symbiosis => sub { KelpX::Symbiosis::Adapter->new(app => $_[0]) };
+
+sub import
+{
+	my ($me) = @_;
+
+	require Kelp::Less;
+	if (defined $Kelp::Less::app) {
+		$Kelp::Less::app = $Kelp::Less::app->_clone($me);
+		$Kelp::Less::app->symbiosis->build(%{$Kelp::Less::app->config_hash});
+	}
+}
 
 sub new
 {
 	my $class = shift;
-	my $self = $self->SUPER::new(@_);
+	my $self = $class->SUPER::new(@_);
 
-	$self->symbiosis->build($self->config_hash);
+	$self->symbiosis->build(%{$self->config_hash});
 
 	return $self;
 }
