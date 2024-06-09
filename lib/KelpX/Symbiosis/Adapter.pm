@@ -1,13 +1,12 @@
 package KelpX::Symbiosis::Adapter;
 
 use Kelp::Base;
-use Plack::App::URLMap;
 use Carp;
-use Scalar::Util qw(blessed refaddr);
 use Plack::Middleware::Conditional;
 use Plack::Util;
 use KelpX::Symbiosis::_Util;
 
+attr engine => sub { croak 'no engine was choosen' };
 attr -app => sub { croak 'app is required' };
 attr -mounted => sub { {} };
 attr -loaded => sub { {} };
@@ -17,19 +16,19 @@ attr reverse_proxy => 0;
 sub mount
 {
 	my ($self, $path, $app) = @_;
-	my $mounted = $self->mounted;
 
 	if (!ref $app && $app) {
 		my $loaded = $self->loaded;
-		croak "Symbiosis: cannot mount $app, because no such name was loaded"
+		croak "Symbiosis: cannot mount $app because no such name was loaded"
 			unless $loaded->{$app};
 		$app = $loaded->{$app};
 	}
 
-	carp "Symbiosis: overriding mounting point $path"
-		if exists $mounted->{$path};
-	$mounted->{$path} = $app;
-	return scalar keys %{$mounted};
+	# mount first, not to pollute mounted hash if the exception is caught and
+	# the program continues
+	my $mounted = $self->engine->mount($path, $app);
+	$self->mounted->{$path} = $app;
+	return $mounted;
 }
 
 sub _link
@@ -37,7 +36,7 @@ sub _link
 	my ($self, $name, $app, $mount) = @_;
 	my $loaded = $self->loaded;
 
-	warn "Symbiosis: overriding module name $name"
+	carp "Symbiosis: overriding module name $name"
 		if exists $loaded->{$name};
 	$loaded->{$name} = $app;
 
@@ -50,36 +49,10 @@ sub _link
 sub run
 {
 	my $self = shift;
-	my $psgi_apps = Plack::App::URLMap->new;
-	my %addrs;    # apps keyed by refaddr
 
-	my $error = "Symbiosis: cannot start the ecosystem because";
-	while (my ($path, $app) = each %{$self->mounted}) {
-		if (blessed $app) {
-			my $addr = refaddr $app;
+	my $app = $self->engine->run(@_);
 
-			if ($app->isa('KelpX::Symbiosis')) {
-				$addrs{$addr} //= sub { $app->psgi(@_) };
-			}
-			else {
-				croak "$error application mounted under $path cannot run()"
-					unless $app->can("run");
-
-				# cache the ran application so that it won't be ran twice
-				$addrs{$addr} //= $app->run(@_);
-			}
-
-			$psgi_apps->map($path, $addrs{$addr});
-		}
-		elsif (ref $app eq 'CODE') {
-			$psgi_apps->map($path, $app);
-		}
-		else {
-			croak "$error mount point $path is neither an object nor a coderef";
-		}
-	}
-
-	my $wrapped = KelpX::Symbiosis::_Util::wrap($self, $psgi_apps->to_app);
+	my $wrapped = KelpX::Symbiosis::_Util::wrap($self, $app);
 	return $self->_reverse_proxy_wrap($wrapped);
 }
 
@@ -99,18 +72,26 @@ sub _reverse_proxy_wrap
 sub build
 {
 	my ($self, %args) = @_;
-	$args{mount} //= '/'
-		unless exists $args{mount};
-
-	if ($args{mount}) {
-		$self->mount($args{mount}, $self->app);
-	}
 
 	if ($args{reverse_proxy}) {
 		$self->reverse_proxy(1);
 	}
 
+	$self->engine->build(%args);
 	KelpX::Symbiosis::_Util::load_middleware($self, %args);
+}
+
+sub new
+{
+	my ($class, %args) = @_;
+
+	my $self = $class->SUPER::new(%args);
+
+	# turn engine into an object
+	my $engine_class = Plack::Util::load_class($self->engine, 'KelpX::Symbiosis::Engine');
+	$self->engine($engine_class->new(adapter => $self));
+
+	return $self;
 }
 
 1;

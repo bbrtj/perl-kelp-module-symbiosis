@@ -26,7 +26,7 @@ sub build
 {
 	my ($self, %args) = @_;
 
-	die 'Kelp::Module::Symbiosis needs to be loaded before ' . ref $self
+	die 'Symbiosis needs to be loaded before ' . $self->name
 		unless $self->app->can('symbiosis');
 
 	KelpX::Symbiosis::_Util::load_middleware($self, %args);

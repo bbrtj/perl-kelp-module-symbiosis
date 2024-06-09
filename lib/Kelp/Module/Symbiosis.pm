@@ -3,7 +3,7 @@ package Kelp::Module::Symbiosis;
 use Kelp::Base qw(Kelp::Module);
 use KelpX::Symbiosis::Adapter;
 
-attr adapter => sub { KelpX::Symbiosis::Adapter->new(app => $_[0]->app) };
+attr adapter => sub { KelpX::Symbiosis::Adapter->new(app => $_[0]->app, engine => 'URLMap') };
 
 sub build
 {

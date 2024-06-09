@@ -1,5 +1,0 @@
-# Common settings
-{
-	mount => undef,
-};
-

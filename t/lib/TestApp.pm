@@ -12,16 +12,15 @@ sub build
 sub build_from_methods
 {
 	my $self = shift;
-	$self->symbiosis->mount('/test', $self->testmod);
+	$self->symbiosis->mount(qr{^/test(/.+)?$}, $self->testmod);
 }
 
 sub build_from_loaded
 {
 	my $self = shift;
 
-	$self->symbiosis->mount('/s', $self);
-	$self->symbiosis->mount('/test', 'symbiont');
 	$self->symbiosis->mount('/test/test2', 'AnotherTestSymbiont');
+	$self->symbiosis->mount(qr{^/test(/.+)?$}, 'symbiont');
 }
 
 sub home

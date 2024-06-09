@@ -11,7 +11,7 @@ my $app = TestApp->new(mode => 'none_mounted');
 my $t = Kelp::Test->new(app => $app);
 $app->build_from_loaded;
 
-$t->request(GET "/s/home")
+$t->request(GET "/home")
 	->code_is(200)
 	->content_is("this is home");
 
@@ -27,7 +27,7 @@ $t->request(GET "/test/wt")
 	->code_is(200)
 	->content_is("mounted");
 
-$t->request(GET "/s")
+$t->request(GET "/")
 	->code_is(404);
 
 done_testing;

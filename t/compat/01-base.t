@@ -40,8 +40,8 @@ can_ok $symbiosis, qw(loaded mounted run mount);
 
 my $mounted = $symbiosis->mounted;
 is scalar keys %$mounted, 2, "mounted count ok";
-isa_ok $mounted->{"/kelp"}, "Kelp";
-isa_ok $mounted->{"/test"}, "TestSymbiont";
+isa_ok $mounted->{'/kelp'}, "Kelp";
+isa_ok $mounted->{'/test'}, "TestSymbiont";
 
 my $loaded = $symbiosis->loaded;
 is scalar keys %$loaded, 1, "loaded count ok";
