@@ -96,3 +96,5 @@ sub new
 
 1;
 
+# This is not internal, but currently no documentation is provided
+
