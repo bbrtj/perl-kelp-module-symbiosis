@@ -3,7 +3,7 @@ use warnings;
 
 use Test::More;
 use HTTP::Request::Common;
-use Kelp::Test;
+use KelpX::Symbiosis::Test;
 use lib 't/lib';
 
 # Kelp module being tested
@@ -11,7 +11,7 @@ use lib 't/lib';
 
 	package Symbiosis::Test;
 
-	use Kelp::Base 'KelpX::Symbiosis';
+	use Kelp::Base 'Kelp';
 
 	sub build
 	{
@@ -29,7 +29,7 @@ use lib 't/lib';
 	1;
 }
 
-my $app = Symbiosis::Test->new();
+my $app = Symbiosis::Test->new(mode => 'just_kelp');
 can_ok $app, qw(symbiosis run_all testmod);
 is $app->symbiosis->reverse_proxy, 0, 'reverse proxy status ok';
 
@@ -44,7 +44,7 @@ my $loaded = $symbiosis->loaded;
 is scalar keys %$loaded, 1, "loaded count ok";
 isa_ok $loaded->{"symbiont"}, "TestSymbiont";
 
-my $t = Kelp::Test->new(app => $app);
+my $t = KelpX::Symbiosis::Test->wrap(app => $app);
 
 $t->request(GET "/")
 	->code_is(404);

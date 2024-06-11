@@ -1,4 +1,4 @@
-package CountingAppCompat;
+package CountingApp;
 use Kelp::Base 'Kelp';
 
 my $ran_times = 0;

@@ -3,7 +3,7 @@ use warnings;
 
 use Test::More;
 use HTTP::Request::Common;
-use Kelp::Test;
+use KelpX::Symbiosis::Test;
 use lib 't/lib';
 
 # Kelp module being tested
@@ -11,12 +11,12 @@ use lib 't/lib';
 
 	package Symbiosis::Static::Test;
 
-	use Kelp::Base 'KelpX::Symbiosis';
+	use Kelp::Base 'Kelp';
 	use Plack::App::File;
 	use Plack::Middleware::AccessLog;
 	use Path::Tiny;
 
-	attr file => sub { Plack::App::File->new(root => path(__FILE__)->parent->child('static')) };
+	attr file => sub { Plack::App::File->new(root => path(__FILE__)->parent->parent->child('static')) };
 
 	sub wrap_static
 	{
@@ -43,8 +43,8 @@ use lib 't/lib';
 	1;
 }
 
-my $app = Symbiosis::Static::Test->new();
-my $t = Kelp::Test->new(app => $app);
+my $app = Symbiosis::Static::Test->new(mode => 'just_kelp');
+my $t = KelpX::Symbiosis::Test->wrap(app => $app);
 
 $t->request(GET "/")
 	->code_is(404);

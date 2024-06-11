@@ -33,6 +33,19 @@ sub run
 }
 
 1;
+__END__
 
-# This is not internal, but currently no documentation is provided
+=head1 NAME
+
+KelpX::Symbiosis::Engine::URLMap - Default engine implementation
+
+=head1 DESCRIPTION
+
+This is a reimplementation of L<KelpX::Symbiosis::Engine> using
+L<Plack::App::URLMap> as a runner. It's pretty straightforward and mounts Kelp
+as just one of the apps in the ecosystem (not giving it any special treatment).
+
+=head1 CAVEATS
+
+=head2 Symbiosis paths will always have priority over Kelp routes
 

@@ -54,7 +54,7 @@ __END__
 
 =head1 NAME
 
-KelpX::Symbiosis::Test - Allow testing legacy symbiotic environments using Kelp::Test
+KelpX::Symbiosis::Test - Allow testing symbiotic environments using Kelp::Test
 
 =head1 SYNOPSIS
 

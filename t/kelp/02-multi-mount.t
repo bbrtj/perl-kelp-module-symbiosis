@@ -5,9 +5,9 @@ use Test::More;
 use HTTP::Request::Common;
 use KelpX::Symbiosis::Test;
 use lib 't/lib';
-use TestAppCompat;
+use TestApp;
 
-my $app = TestAppCompat->new(mode => 'mostly_mounted');
+my $app = TestApp->new(mode => 'mostly_mounted');
 $app->build_from_methods;
 my $t = KelpX::Symbiosis::Test->wrap(app => $app);
 
@@ -16,7 +16,7 @@ is scalar keys %$loaded, 2, "loaded count ok";
 isa_ok $loaded->{"symbiont"}, "TestSymbiont";
 isa_ok $loaded->{"AnotherTestSymbiont"}, "AnotherTestSymbiont";
 
-$t->request(GET "/s/home")
+$t->request(GET "/home")
 	->code_is(200)
 	->content_is("this is home");
 
@@ -32,7 +32,7 @@ $t->request(GET "/test/wt")
 	->code_is(200)
 	->content_is("mounted");
 
-$t->request(GET "/s")
+$t->request(GET "/")
 	->code_is(404);
 
 done_testing;

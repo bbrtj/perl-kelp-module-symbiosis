@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 use Test::More;
-use Kelp::Test;
+use KelpX::Symbiosis::Test;
 use HTTP::Request::Common;
 use Kelp::Test;
 
@@ -11,8 +11,9 @@ use Kelp::Test;
 	package Less::Test;
 
 	use Kelp::Less;
-	use KelpX::Symbiosis;
 	use Plack::Response;
+
+	module 'Symbiosis';
 
 	my $app = sub {
 		my $res = Plack::Response->new(200);
@@ -34,7 +35,7 @@ use Kelp::Test;
 	1;
 }
 
-my $t = Kelp::Test->new(app => Less::Test::get_app);
+my $t = KelpX::Symbiosis::Test->wrap(app => Less::Test::get_app);
 
 $t->request(GET "/")
 	->code_is(200)

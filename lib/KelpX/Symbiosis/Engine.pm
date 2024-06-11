@@ -38,15 +38,64 @@ sub build
 
 sub mount
 {
+	my ($self, $path, $app) = @_;
 	croak 'mount needs to be overridden';
 }
 
 sub run
 {
+	my ($self) = @_;
 	croak 'run needs to be overridden';
 }
 
 1;
+__END__
 
-# This is not internal, but currently no documentation is provided
+=head1 NAME
+
+KelpX::Symbiosis::Engine - Base class for engine implementation
+
+=head1 SYNOPSIS
+
+See the code of L<KelpX::Symbiosis::Engine::URLMap> as an example.
+
+=head1 DESCRIPTION
+
+This is a base to be reimplemented for a specific way to run an ecosystem. An
+engine should be able to mount plack apps under itself and route traffic to
+them.
+
+=head1 USAGE
+
+=head2 Attributes
+
+=head3 adapter
+
+An instance of L<KelpX::Symbiosis::Adapter>.
+
+=head3 app_runners
+
+A cache for L</run_app>.
+
+=head2 Methods
+
+=head3 run_app
+
+Finds, runs and caches an app to be mounted. Returns a coderef with the
+plackified app. No need to override this, but can be useful when mounting an
+app
+
+=head3 build
+
+Builds this engine. Run once after instantiating, passing all the Symbiosis
+configuration. Can be overriden, by default mounts the app to where it was
+configured to mount (but does not mount under C</> by default).
+
+=head3 mount
+
+Mount a plack app under the given path. Must be overridden.
+
+=head3 run
+
+Run the ecosystem, but without the top-level middleware. Must be overridden.
 

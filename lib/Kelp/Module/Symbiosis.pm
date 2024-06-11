@@ -3,16 +3,18 @@ package Kelp::Module::Symbiosis;
 use Kelp::Base qw(Kelp::Module);
 use KelpX::Symbiosis::Adapter;
 
-attr adapter => sub { KelpX::Symbiosis::Adapter->new(app => $_[0]->app, engine => 'URLMap') };
-
 sub build
 {
 	my ($self, %args) = @_;
 
-	$self->adapter->build(%args);
+	my $adapter = KelpX::Symbiosis::Adapter->new(
+		app => $self->app,
+		engine => delete $args{engine} // 'URLMap'
+	);
 
+	$adapter->build(%args);
 	$self->register(
-		symbiosis => $self->adapter,
+		symbiosis => $adapter,
 		run_all => sub { shift->symbiosis->run(@_); },
 	);
 
@@ -23,7 +25,7 @@ __END__
 
 =head1 NAME
 
-Kelp::Module::Symbiosis - Manage an entire ecosystem of Plack organisms under Kelp
+Kelp::Module::Symbiosis - Fertile ground for building Plack apps
 
 =head1 SYNOPSIS
 
@@ -54,19 +56,7 @@ This module is an attempt to standardize the way many standalone Plack
 applications should be ran alongside the Kelp framework. The intended use is to
 introduce new "organisms" into symbiotic interaction by creating Kelp modules
 that are then attached onto Kelp. Then, the added method I<run_all> should be
-invoked in place of Kelp's I<run>, which will construct a L<Plack::App::URLMap>
-and return it as an application.
-
-=head2 KelpX::Symbiosis
-
-Starting from version C<2.00>, this module is no longer just a syntax sugar for
-L<Plack::App::URLMap>. It offers the new L<KelpX::Symbiosis> is a base class
-for your Kelp application, which B<routes all traffic through the Kelp router>.
-This means you can freely mix and match your own Kelp code with plack
-applications and middlewares. See its documentation for details.
-
-Both L<Kelp::Module::Symbiosis> and L<KelpX::Symbiosis> have their use cases,
-use the one which suits you best.
+invoked in place of Kelp's I<run>, which will construct and return an ecosystem.
 
 =head2 Why not just use Plack::Builder in a .psgi script?
 
@@ -125,6 +115,8 @@ For very simple use cases, this will work though:
 
 =head1 METHODS
 
+These methods are available on the object in C<< $app->symbiosis >>:
+
 =head2 mount
 
 	sig: mount($self, $path, $app)
@@ -150,8 +142,8 @@ See L<Kelp::Module::Symbiosis::Base/name>
 
 =head2 run
 
-Constructs and returns a new L<Plack::App::URLMap> with all the mounted modules
-and Kelp itself.
+Returns a coderef ready to be run by a Plack handler. Details on that depend on
+the engine used, see L</engine>.
 
 Note: it will not run mounted object twice. This means that it is safe to mount
 something in two paths at once, and it will just be an alias to the same
@@ -202,6 +194,23 @@ Symbiosis should be the first of the symbiotic modules specified in your Kelp
 configuration. Failure to meet this requirement will cause your application to
 crash immediately.
 
+=head2 engine
+
+I<new in 2.00>
+
+Engine is the approach taken by the module to run your apps. Engines are
+implemented in namespace C<KelpX::Symbiosis::Engine>. Bundled engines include:
+
+=over
+
+=item * L<KelpX::Symbiosis::Engine::URLMap>, which uses L<App::Plack::URLMap> and mounts Kelp into it alongside other apps
+
+=item * L<KelpX::Symbiosis::Engine::Kelp>, which uses app routing to mount other apps
+
+=back
+
+Default is C<URLMap>. See their documentation for caveats regarding each implementation.
+
 =head2 mount
 
 I<new in 1.10>
@@ -209,7 +218,9 @@ I<new in 1.10>
 A path to mount the Kelp instance, which defaults to I<'/'>. Specify a string
 if you wish a to use different path. Specify an I<undef> or empty string to
 avoid mounting at all - you will have to run something like C<<
-$kelp->symbiosis->mount($mount_path, $kelp); >> in Kelp's I<build> method.
+$kelp->symbiosis->mount($mount_path, $kelp); >> in Kelp's I<build> method
+(unless the engine is C<Kelp>, in which case you can't mount the app anywhere -
+it will always be root).
 
 =head2 reverse_proxy
 
@@ -237,8 +248,6 @@ specify Kelp route for anything under I</api>.
 =head1 SEE ALSO
 
 =over
-
-=item * L<KelpX::Symbiosis>, a diffrent approach to the same problem
 
 =item * L<Kelp::Module::Symbiosis::Base>, a base for symbiotic modules
 

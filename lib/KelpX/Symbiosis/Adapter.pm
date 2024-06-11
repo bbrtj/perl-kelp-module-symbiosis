@@ -4,7 +4,7 @@ use Kelp::Base;
 use Carp;
 use Plack::Middleware::Conditional;
 use Plack::Util;
-use KelpX::Symbiosis::_Util;
+use KelpX::Symbiosis::Util;
 
 attr engine => sub { croak 'no engine was choosen' };
 attr -app => sub { croak 'app is required' };
@@ -52,7 +52,7 @@ sub run
 
 	my $app = $self->engine->run(@_);
 
-	my $wrapped = KelpX::Symbiosis::_Util::wrap($self, $app);
+	my $wrapped = KelpX::Symbiosis::Util::wrap($self, $app);
 	return $self->_reverse_proxy_wrap($wrapped);
 }
 
@@ -78,7 +78,7 @@ sub build
 	}
 
 	$self->engine->build(%args);
-	KelpX::Symbiosis::_Util::load_middleware($self, %args);
+	KelpX::Symbiosis::Util::load_middleware($self, %args);
 }
 
 sub new
@@ -96,5 +96,6 @@ sub new
 
 1;
 
-# This is not internal, but currently no documentation is provided
+# This is not internal, but currently no specific documentation is provided.
+# All of the interface is documented in Kelp::Module::Symbiosis.
 

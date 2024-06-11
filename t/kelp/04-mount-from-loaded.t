@@ -3,12 +3,12 @@ use warnings;
 
 use Test::More;
 use HTTP::Request::Common;
-use Kelp::Test;
+use KelpX::Symbiosis::Test;
 use lib 't/lib';
 use TestApp;
 
 my $app = TestApp->new(mode => 'none_mounted');
-my $t = Kelp::Test->new(app => $app);
+my $t = KelpX::Symbiosis::Test->wrap(app => $app);
 $app->build_from_loaded;
 
 $t->request(GET "/home")

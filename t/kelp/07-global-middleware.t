@@ -3,7 +3,7 @@ use warnings;
 
 use Test::More;
 use HTTP::Request::Common;
-use Kelp::Test;
+use KelpX::Symbiosis::Test;
 use lib 't/lib';
 
 # Kelp module being tested
@@ -11,7 +11,7 @@ use lib 't/lib';
 
 	package Symbiosis::Test;
 
-	use Kelp::Base 'KelpX::Symbiosis';
+	use Kelp::Base 'Kelp';
 
 	sub build
 	{
@@ -26,7 +26,7 @@ use lib 't/lib';
 }
 
 my $app = Symbiosis::Test->new(mode => 'global_middleware');
-my $t = Kelp::Test->new(app => $app);
+my $t = KelpX::Symbiosis::Test->wrap(app => $app);
 
 $t->request(GET "/kelp/test")
 	->code_is(200)
