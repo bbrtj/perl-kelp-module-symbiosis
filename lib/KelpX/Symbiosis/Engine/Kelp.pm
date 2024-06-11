@@ -11,9 +11,31 @@ sub _get_destination
 
 	return sub {
 		my $kelp = shift;
+		my $path = pop() // '';
 		my $env = $kelp->req->env;
+
+		# remember script and path
+		my $orig_script = $env->{SCRIPT_NAME};
+		my $orig_path = $env->{PATH_INFO};
+
+		# adjust slashes in paths
+		my $trailing_slash = $orig_path =~ m{/$} ? '/' : '';
+		$path =~ s{^/?}{/};
+		$path =~ s{/?$}{$trailing_slash};
+
+		# adjust script and path
+		$env->{SCRIPT_NAME} = $orig_path;
+		$env->{SCRIPT_NAME} =~ s{\Q$path\E$}{};
+		$env->{PATH_INFO} = $path;
+
+		# run the callback
 		my $result = $cb->($env, @_);
 
+		# restore old script and path
+		$env->{SCRIPT_NAME} = $orig_script;
+		$env->{PATH_INFO} = $orig_path;
+
+		# produce a response
 		if (ref $result eq 'ARRAY') {
 			my ($status, $headers, $body) = @{$result};
 
@@ -27,7 +49,7 @@ sub _get_destination
 			return $result;
 		}
 
-		# this should be an error unless rendered
+		# this should be an error unless already rendered
 		return;
 	};
 }
