@@ -18,7 +18,7 @@ use lib 't/lib';
 		my $self = shift;
 		$self->load_module("+TestSymbiont", middleware => [qw(ContentMD5)]);
 
-		$self->symbiosis->mount('/test/>', $self->testmod);
+		$self->symbiosis->mount('/test', $self->testmod);
 		$self->symbiosis->mount([GET => qr{^/test2(?:/.+)?$}], $self->testmod);
 
 		$self->add_route("/testkelp" => sub {
@@ -38,7 +38,7 @@ can_ok $symbiosis, qw(loaded mounted run mount);
 
 my $mounted = $symbiosis->mounted;
 is scalar keys %$mounted, 2, "mounted count ok";
-isa_ok $mounted->{'/test/>'}, "TestSymbiont";
+isa_ok $mounted->{'/test'}, "TestSymbiont";
 
 my $loaded = $symbiosis->loaded;
 is scalar keys %$loaded, 1, "loaded count ok";

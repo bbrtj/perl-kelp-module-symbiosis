@@ -37,7 +37,7 @@ use lib 't/lib';
 	{
 		my $self = shift;
 
-		$self->symbiosis->mount('/static/>', $self->wrap_static);
+		$self->symbiosis->mount('/static', $self->wrap_static);
 	}
 
 	1;

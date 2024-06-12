@@ -32,7 +32,7 @@ use lib 't/lib';
 			];
 		};
 
-		$self->symbiosis->mount('/path/>rest', $dumper_app);
+		$self->symbiosis->mount('/path', $dumper_app);
 		$self->symbiosis->mount('/script', $dumper_app);
 	}
 

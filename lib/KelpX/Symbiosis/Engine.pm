@@ -71,7 +71,7 @@ them.
 
 =head3 adapter
 
-An instance of L<KelpX::Symbiosis::Adapter>.
+An instance of C<KelpX::Symbiosis::Adapter>.
 
 =head3 app_runners
 
