@@ -38,7 +38,7 @@ sub can
 
 sub AUTOLOAD
 {
-	my ($self) = @_;
+	my $self = shift;
 
 	my $func = our $AUTOLOAD;
 	return if $func =~ /::DESTROY$/;

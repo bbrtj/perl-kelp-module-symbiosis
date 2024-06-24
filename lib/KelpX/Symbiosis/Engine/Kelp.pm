@@ -17,15 +17,16 @@ sub mount
 	if (!ref $path) {
 		$path =~ s{/?$}{/>subpath};
 	}
-	elsif (ref $path eq 'ARRAY') {
+	elsif (ref $path eq 'ARRAY' && !ref $path->[1]) {
 		$path->[1] =~ s{/?$}{/>subpath};
 	}
 
-
-	$self->router->add($path, {
-		to => $self->run_app($app),
-		psgi => 1,
-	});
+	$self->router->add(
+		$path, {
+			to => $self->run_app($app),
+			psgi => 1,
+		}
+	);
 }
 
 sub run
